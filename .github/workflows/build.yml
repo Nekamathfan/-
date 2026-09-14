@@ -1,0 +1,44 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout код
+        uses: actions/checkout@v4
+
+      - name: Насби Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Насби китобхонаҳо
+        run: npm install
+
+      - name: Сохтани папкаи Android
+        run: npx expo prebuild --platform android
+
+      - name: Насби Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Сохтани файли APK
+        run: |
+          cd android
+          chmod +x ./gradlew
+          ./gradlew assembleRelease
+
+      - name: Боргирии APK ба GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: LBHB-App-APK
+          path: android/app/build/outputs/apk/release/app-release.apk
